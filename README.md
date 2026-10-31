@@ -1,47 +1,35 @@
-# Module - Login as User
+# Login as User
 
-Adds "Login as User" feature for administrators, making it, for example, easier to debug ACL.
+EspoCRM extension that lets administrators log in as another user — for example, to debug ACL.
 
-## Table of Contents
+## Requirements
 
-* [Introduction](#introduction)
-* [Requires](#requires)
-* [Installation](#installation)
-    * [Pre-build extension release](#pre-build-extension-release)
-    * [Build from source](#build-from-source)
-
-## Introduction
-
-Adds "Login as User" feature for administrators, making it, for example, easier to debug ACL.
-
-## Requires
-
-- EspoCRM >= 7.0
-- PHP >= 7.4
+- EspoCRM ≥ 10.0
+- PHP 8.3 – 8.5
 
 ## Installation
 
-### Pre-build extension release
+1. Download the latest zip from the [Releases page](https://github.com/bshumylo/Login-as-User/releases/latest).
+2. Go to **Administration → Extensions**, upload the zip and install it.
 
-1. Download the latest release from [Release page](https://github.com/bshumylo/Login-as-User/releases/latest).
-2. Go to **Administration** -> **Extensions** and upload the downloaded file.
+## Usage
 
-### Build from source
+Open a user record (regular, admin or portal user) and choose **Login as User** in the dropdown of the top-right
+actions. While you act as that user, the **Log Out** item of the user menu turns into **Return to My Account**.
 
-1. Make sure than `node`, `npm` and `composer` are installed.
-2. Clone the repository.
-3. Run `npm install`.
-4. Run `grunt package`. This will create a `dist` folder with the final extension package..
+Only administrators can use the feature. If a non-admin session carries the `login-as-user-id` cookie, the request is
+refused and logged.
 
-#### Deploying
+## Build from source
 
-Optionally you can create a `.env` file based on the `.env.template` file. The `.env` file will be used to deploy the
-extension to an existing EspoCRM installation.
-
-**Linux example**
-
-```shell
-mv .env.template .env
-vim .env # edit the file
-grunt deploy # deploy the extension
+```bash
+npm ci
+node build --extension   # -> build/login-as-user-<version>.zip
 ```
+
+Pushing a new version in `extension.json` (and `package.json`) to `main` creates a tag and a GitHub release with the
+zip automatically (see `.github/workflows/release.yml`).
+
+## License
+
+GPL-3.0-or-later. Originally created by Apertia Tech s.r.o.

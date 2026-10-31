@@ -1,0 +1,15 @@
+{
+    "module": "LoginAsUser",
+    "name": "Login as User",
+    "description": "Adds the \"Login as User\" feature for administrators, making it, for example, easier to debug ACL.",
+    "author": "bshumylo",
+    "bundled": false,
+    "acceptableVersions": [
+        ">=10.0.0"
+    ],
+    "php": [
+        ">=8.3"
+    ],
+    "scripts": [],
+    "version": "1.0.0"
+}

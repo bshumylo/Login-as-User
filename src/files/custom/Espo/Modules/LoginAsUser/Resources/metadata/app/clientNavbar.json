@@ -1,0 +1,7 @@
+{
+    "menuItems": {
+        "logout": {
+            "handler": "login-as-user:handlers/navbar-menu"
+        }
+    }
+}

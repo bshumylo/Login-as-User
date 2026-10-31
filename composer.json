@@ -1,0 +1,16 @@
+{
+    "name": "espocrm/ext-login-as-user",
+    "require": {
+        "php": ">=8.3"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Espo\\Modules\\LoginAsUser\\": "src/files/custom/Espo/Modules/LoginAsUser",
+            "tests\\unit\\Espo\\Modules\\LoginAsUser\\": "tests/unit/Espo/Modules/LoginAsUser"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.5",
+        "phpstan/phpstan": "^2.1"
+    }
+}

@@ -1,0 +1,21 @@
+{
+    "menu": {
+        "detail": {
+            "dropdown": [
+                "__APPEND__",
+                {
+                    "name": "loginAsUser",
+                    "label": "Login as User",
+                    "handler": "login-as-user:handlers/actions/login-as-user",
+                    "actionFunction": "loginAsUser",
+                    "checkVisibilityFunction": "isAvailable",
+                    "accessDataList": [
+                        {
+                            "isAdminOnly": true
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

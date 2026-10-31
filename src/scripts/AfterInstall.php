@@ -1,59 +1,17 @@
 <?php
 
-use Espo\Core\Container;
+declare(strict_types=1);
 
+use Espo\Core\Container;
+use Espo\Core\DataManager;
+
+/**
+ * Called when the extension is installed.
+ */
 class AfterInstall
 {
-    protected const TAB_LIST_ENTITIES = [];
-    protected const DEFAULT_CONFIG = [];
-
-    protected Container $container;
-
-    public function run(Container $container, array $params = []): void
+    public function run(Container $container): void
     {
-        $this->container = $container;
-
-        if (empty($params['isUpgrade'])) {
-            $this->defaultConfig();
-            $this->addEntitiesToTabList();
-        }
-
-        $this->clearCache();
-    }
-
-    protected function defaultConfig(): void
-    {
-        $config = $this->container->get('config');
-
-        foreach (self::DEFAULT_CONFIG as $key => $value) {
-            if (!$config->has($key)) {
-                $config->set($key, $value);
-            }
-        }
-
-        $config->save();
-    }
-
-    protected function addEntitiesToTabList(): void
-    {
-        $config = $this->container->get('config');
-        $tabList = $config->get('tabList');
-
-        foreach (self::TAB_LIST_ENTITIES as $entity) {
-            if (!in_array($entity, $tabList)) {
-                $tabList[] = $entity;
-            }
-        }
-
-        $config->set('tabList', $tabList);
-        $config->save();
-    }
-
-    protected function clearCache(): void
-    {
-        try {
-            $this->container->get('dataManager')->clearCache();
-        } catch (\Exception $e) {
-        }
+        $container->getByClass(DataManager::class)->clearCache();
     }
 }
