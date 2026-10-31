@@ -1,6 +1,7 @@
 {
     "labels": {
         "Login as User": "Login as User",
-        "Return to My Account": "Return to My Account"
+        "Return to My Account": "Return to My Account",
+        "actingAs": "Acting as {name}"
     }
 }

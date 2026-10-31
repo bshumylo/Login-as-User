@@ -1,0 +1,5 @@
+{
+    "loginAsUser": {
+        "className": "Espo\\Modules\\LoginAsUser\\Classes\\AppParams\\LoginAsUser"
+    }
+}

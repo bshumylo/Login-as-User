@@ -7,14 +7,17 @@ define(['action-handler', 'login-as-user:helpers/impersonation'], (Dep, imperson
             const user = this.view.getUser();
 
             return user.isAdmin() &&
-                !impersonation.isActive() &&
+                !impersonation.getState(this.view.getHelper()) &&
                 model.id !== user.id &&
                 (model.isRegular() || model.isAdmin() || model.isPortal());
         }
 
         loginAsUser() {
-            impersonation.start(this.view.model.id);
-            impersonation.reloadToHome();
+            Espo.Ui.notifyWait();
+
+            impersonation.start(this.view.model.id)
+                .then(() => impersonation.reloadToHome())
+                .catch(() => Espo.Ui.notify(false));
         }
     };
 });

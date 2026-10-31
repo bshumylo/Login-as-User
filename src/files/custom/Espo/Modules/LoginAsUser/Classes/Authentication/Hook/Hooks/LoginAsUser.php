@@ -8,66 +8,74 @@ use Espo\Core\Api\Request;
 use Espo\Core\Authentication\AuthenticationData;
 use Espo\Core\Authentication\Hook\OnResult;
 use Espo\Core\Authentication\Result;
-use Espo\Core\Exceptions\Forbidden;
 use Espo\Core\Utils\Log;
 use Espo\Entities\User;
+use Espo\Modules\LoginAsUser\Classes\Impersonation\TicketCodec;
+use Espo\Modules\LoginAsUser\Classes\Impersonation\TicketCookie;
 use Espo\ORM\EntityManager;
 
 /**
- * Replaces the authenticated administrator with the user whose id is stored in
- * the `login-as-user-id` cookie. Only administrators may do this.
+ * Replaces the authenticated administrator with the user named in a valid ticket cookie.
+ *
+ * The ticket is signed by the server, bound to the administrator and to the auth token of the session,
+ * and expires. Any invalid ticket is ignored: the request is then served as the administrator.
  */
 class LoginAsUser implements OnResult
 {
-    public const COOKIE_NAME = 'login-as-user-id';
+    public const ACTOR_ATTRIBUTE = 'loginAsUserActorId';
 
     public function __construct(
         private User $user,
         private EntityManager $entityManager,
+        private TicketCodec $codec,
         private Log $log,
     ) {}
 
-    /**
-     * @throws Forbidden
-     */
     public function process(Result $result, AuthenticationData $data, Request $request): void
     {
-        $user = $result->getUser();
-        $loginAsUserId = $request->getCookieParam(self::COOKIE_NAME);
+        $value = $request->getCookieParam(TicketCookie::NAME);
+        $token = $data->getPassword();
+        $admin = $result->getUser();
 
-        if ($loginAsUserId === null || $user === null) {
+        if ($value === null || $value === '' || $token === null || $token === '' || $admin === null) {
             return;
         }
 
-        if (!$user->isAdmin()) {
-            $this->log->warning('Trying to login as user by non-admin user.', [
-                'userId' => $user->getId(),
-                'loginAsUserId' => $loginAsUserId,
+        $ticket = $this->codec->decode($value);
+
+        if ($ticket === null) {
+            $this->log->warning('Login as User: a ticket with an invalid signature was ignored.', [
+                'userId' => $admin->getId(),
             ]);
 
-            throw new Forbidden('Insufficient permissions for logging in as other users.');
+            return;
         }
 
-        $loginAsUser = $this->entityManager->getEntityById(User::ENTITY_TYPE, $loginAsUserId);
+        if (
+            $ticket->isExpired(time()) ||
+            !$admin->isAdmin() ||
+            $ticket->actorId !== $admin->getId() ||
+            !hash_equals($ticket->tokenHash, TicketCodec::hashToken($token))
+        ) {
+            return;
+        }
 
-        if (!$loginAsUser instanceof User) {
-            $this->log->warning('Trying to login as user that does not exist.', [
-                'userId' => $user->getId(),
-                'loginAsUserId' => $loginAsUserId,
-            ]);
+        $target = $this->entityManager->getEntityById(User::ENTITY_TYPE, $ticket->targetId);
 
-            throw new Forbidden('User does not exist.');
+        if (!$target instanceof User || !$target->isActive()) {
+            return;
         }
 
         // The same preparation the core does for a logged user: team-based ACL needs the teams.
-        if (!$loginAsUser->isPortal()) {
-            $loginAsUser->loadLinkMultipleField('teams');
+        if (!$target->isPortal()) {
+            $target->loadLinkMultipleField('teams');
         }
 
-        $ipAddress = $user->get('ipAddress');
+        $ipAddress = $admin->get('ipAddress');
 
         $this->user->reset();
-        $this->user->set($loginAsUser->getValueMap());
+        $this->user->set($target->getValueMap());
         $this->user->set('ipAddress', $ipAddress);
+        $this->user->set(self::ACTOR_ATTRIBUTE, $admin->getId());
     }
 }

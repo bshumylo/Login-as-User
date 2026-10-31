@@ -1,0 +1,12 @@
+{
+    "fields": {
+        "loginAsUserActorId": {
+            "type": "varchar",
+            "notStorable": true,
+            "readOnly": true,
+            "orderDisabled": true,
+            "utility": true,
+            "customizationDisabled": true
+        }
+    }
+}

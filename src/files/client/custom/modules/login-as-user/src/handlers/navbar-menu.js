@@ -3,14 +3,13 @@ define(['handlers/navbar-menu', 'login-as-user:helpers/impersonation'], (Dep, im
     return class extends Dep {
 
         logout() {
-            if (!impersonation.isActive()) {
+            if (!impersonation.getState(this.view.getHelper())) {
                 super.logout();
 
                 return;
             }
 
-            impersonation.stop();
-            impersonation.reloadToHome();
+            impersonation.stop().then(() => impersonation.reloadToHome());
         }
     };
 });
