@@ -17,8 +17,22 @@ EspoCRM extension that lets administrators log in as another user — for exampl
 Open a user record (regular, admin or portal user) and choose **Login as User** in the dropdown of the top-right
 actions. While you act as that user, the **Log Out** item of the user menu turns into **Return to My Account**.
 
-Only administrators can use the feature. If a non-admin session carries the `login-as-user-id` cookie, the request is
-refused and logged.
+While you act as another user, an *Acting as …* banner with a **Return to My Account** button stays on screen.
+Everything you do is recorded as that user (created by, modified by, stream) — the extension logs the start and the end
+of every session (who, as whom, IP address) to the EspoCRM log.
+
+### How it is secured
+
+- **Administrators only.** You cannot act as yourself, as an inactive, system or API user, or — unless you are a
+  super-admin — as a super-admin. The rules are checked when the session starts and on every request.
+- **A signed ticket, not a plain cookie.** *Login as User* asks the server (`POST /api/v1/LoginAsUser/start`), which
+  sets an **HttpOnly** cookie signed with the instance `cryptKey`. The ticket names the administrator, the target
+  user, the auth token of the current session and an expiry, so it cannot be forged, reused after logout or in another
+  session, or read by scripts. Invalid tickets are ignored.
+- **Time-limited.** One hour by default; set `'loginAsUserTtl' => 1800` (seconds, 60–28800) in
+  `data/config.php` to change it. Click *Return to My Account* or log out to end it earlier.
+
+Upgrading from the pre-1.0 versions: the old `login-as-user-id` cookie is removed automatically and is no longer used.
 
 ## Build from source
 

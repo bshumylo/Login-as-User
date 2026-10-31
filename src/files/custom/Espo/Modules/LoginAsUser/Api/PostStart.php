@@ -15,6 +15,7 @@ use Espo\Core\Utils\Log;
 use Espo\Entities\User;
 use Espo\Modules\LoginAsUser\Classes\Authentication\Hook\Hooks\LoginAsUser;
 use Espo\Modules\LoginAsUser\Classes\Impersonation\RequestToken;
+use Espo\Modules\LoginAsUser\Classes\Impersonation\TargetPolicy;
 use Espo\Modules\LoginAsUser\Classes\Impersonation\Ticket;
 use Espo\Modules\LoginAsUser\Classes\Impersonation\TicketCodec;
 use Espo\Modules\LoginAsUser\Classes\Impersonation\TicketCookie;
@@ -36,6 +37,7 @@ class PostStart implements Action
         private Config $config,
         private TicketCodec $codec,
         private TicketCookie $cookie,
+        private TargetPolicy $policy,
         private Log $log,
     ) {}
 
@@ -61,13 +63,7 @@ class PostStart implements Action
             throw new Forbidden('User does not exist.');
         }
 
-        if (
-            $target->getId() === $this->user->getId() ||
-            !$target->isActive() ||
-            $target->isSystem() ||
-            $target->isApi() ||
-            ($target->isSuperAdmin() && !$this->user->isSuperAdmin())
-        ) {
+        if (!$this->policy->isAllowed($this->user, $target)) {
             throw new Forbidden('It is not allowed to log in as this user.');
         }
 

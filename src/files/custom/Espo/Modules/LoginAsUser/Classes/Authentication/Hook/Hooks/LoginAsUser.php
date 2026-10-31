@@ -10,9 +10,11 @@ use Espo\Core\Authentication\Hook\OnResult;
 use Espo\Core\Authentication\Result;
 use Espo\Core\Utils\Log;
 use Espo\Entities\User;
+use Espo\Modules\LoginAsUser\Classes\Impersonation\TargetPolicy;
 use Espo\Modules\LoginAsUser\Classes\Impersonation\TicketCodec;
 use Espo\Modules\LoginAsUser\Classes\Impersonation\TicketCookie;
 use Espo\ORM\EntityManager;
+use Throwable;
 
 /**
  * Replaces the authenticated administrator with the user named in a valid ticket cookie.
@@ -28,6 +30,7 @@ class LoginAsUser implements OnResult
         private User $user,
         private EntityManager $entityManager,
         private TicketCodec $codec,
+        private TargetPolicy $policy,
         private Log $log,
     ) {}
 
@@ -41,7 +44,13 @@ class LoginAsUser implements OnResult
             return;
         }
 
-        $ticket = $this->codec->decode($value);
+        try {
+            $ticket = $this->codec->decode($value);
+        } catch (Throwable $e) {
+            $this->log->error('Login as User: cannot verify the ticket: ' . $e->getMessage());
+
+            return;
+        }
 
         if ($ticket === null) {
             $this->log->warning('Login as User: a ticket with an invalid signature was ignored.', [
@@ -53,7 +62,6 @@ class LoginAsUser implements OnResult
 
         if (
             $ticket->isExpired(time()) ||
-            !$admin->isAdmin() ||
             $ticket->actorId !== $admin->getId() ||
             !hash_equals($ticket->tokenHash, TicketCodec::hashToken($token))
         ) {
@@ -62,7 +70,7 @@ class LoginAsUser implements OnResult
 
         $target = $this->entityManager->getEntityById(User::ENTITY_TYPE, $ticket->targetId);
 
-        if (!$target instanceof User || !$target->isActive()) {
+        if (!$target instanceof User || !$this->policy->isAllowed($admin, $target)) {
             return;
         }
 
