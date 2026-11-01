@@ -1,22 +1,17 @@
 <?php
 
-use Espo\Core\Container;
+declare(strict_types=1);
 
+use Espo\Core\Container;
+use Espo\Core\DataManager;
+
+/**
+ * Called when the extension is uninstalled.
+ */
 class AfterUninstall
 {
-    protected Container $container;
-
-    public function run(Container $container, array $params = []): void
+    public function run(Container $container): void
     {
-        $this->container = $container;
-        $this->clearCache();
-    }
-
-    protected function clearCache(): void
-    {
-        try {
-            $this->container->get('dataManager')->clearCache();
-        } catch (\Exception $e) {
-        }
+        $container->getByClass(DataManager::class)->clearCache();
     }
 }

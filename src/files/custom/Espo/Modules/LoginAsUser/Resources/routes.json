@@ -1,0 +1,14 @@
+[
+    {
+        "route": "/LoginAsUser/start",
+        "method": "post",
+        "actionClassName": "Espo\\Modules\\LoginAsUser\\Api\\PostStart",
+        "apiAuthForbidden": true
+    },
+    {
+        "route": "/LoginAsUser/stop",
+        "method": "post",
+        "actionClassName": "Espo\\Modules\\LoginAsUser\\Api\\PostStop",
+        "apiAuthForbidden": true
+    }
+]

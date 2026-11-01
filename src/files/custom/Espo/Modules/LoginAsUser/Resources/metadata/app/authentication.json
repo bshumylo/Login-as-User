@@ -1,0 +1,6 @@
+{
+    "onSuccessByTokenHookClassNameList": [
+        "__APPEND__",
+        "Espo\\Modules\\LoginAsUser\\Classes\\Authentication\\Hook\\Hooks\\LoginAsUser"
+    ]
+}
