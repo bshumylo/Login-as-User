@@ -4,6 +4,13 @@
  */
 define(() => {
 
+    /**
+     * The backend requires the header as a CSRF guard. Espo.Ajax (EspoCRM 10) does not add it by itself.
+     */
+    const options = {
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+    };
+
     return {
         /**
          * @param {module:helper} helper
@@ -18,14 +25,14 @@ define(() => {
          * @return {Promise}
          */
         start(userId) {
-            return Espo.Ajax.postRequest('LoginAsUser/start', {userId: userId});
+            return Espo.Ajax.postRequest('LoginAsUser/start', {userId: userId}, options);
         },
 
         /**
          * @return {Promise}
          */
         stop() {
-            return Espo.Ajax.postRequest('LoginAsUser/stop', {});
+            return Espo.Ajax.postRequest('LoginAsUser/stop', {}, options);
         },
 
         reloadToHome() {
