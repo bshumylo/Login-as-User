@@ -1,6 +1,6 @@
 {
   "name": "espocrm-ext-login-as-user",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Extension: Login as User for EspoCRM administrators.",
   "scripts": {
     "sa": "vendor/bin/phpstan",

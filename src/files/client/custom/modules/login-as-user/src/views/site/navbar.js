@@ -49,7 +49,8 @@ define(['views/site/navbar', 'login-as-user:helpers/impersonation'], (Dep, imper
 
             const banner = document.createElement('div');
 
-            banner.className = 'login-as-user-banner';
+            // Colors, border and shadow come from the active theme (alert-danger, theme CSS variables).
+            banner.className = 'login-as-user-banner alert alert-danger';
             banner.setAttribute('role', 'status');
 
             Object.assign(banner.style, {
@@ -60,12 +61,13 @@ define(['views/site/navbar', 'login-as-user:helpers/impersonation'], (Dep, imper
                 display: 'flex',
                 alignItems: 'center',
                 gap: '10px',
+                margin: '0',
                 padding: '6px 6px 6px 14px',
-                borderRadius: '20px',
-                background: '#b94a48',
-                color: '#fff',
-                fontSize: '13px',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.35)',
+                minHeight: '0',
+                maxWidth: 'calc(100vw - 24px)',
+                borderRadius: 'var(--border-radius)',
+                fontSize: 'var(--font-size-small)',
+                boxShadow: 'var(--dropdown-box-shadow)',
             });
 
             const text = document.createElement('span');

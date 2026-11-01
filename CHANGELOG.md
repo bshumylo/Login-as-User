@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1
+
+### Fixes
+- *Login as User* and *Return to My Account* failed with "Access denied / Missing required header." on EspoCRM 10: `Espo.Ajax` no longer adds `X-Requested-With`, so the client now sends it explicitly. The backend check is unchanged.
+- The *Acting as …* banner now follows the active theme (`alert-danger` and theme variables) instead of a hard-coded red.
+
 ## 1.0.0
 
 First release of this fork on the official extension template.
